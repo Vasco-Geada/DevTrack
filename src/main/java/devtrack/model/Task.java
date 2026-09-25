@@ -6,7 +6,7 @@ import devtrack.model.Enums.Status;
 
 public class Task extends Issue {
 	// Attributes
-	private double estimatedHours = 0;
+	private double estimatedHours = 1;
 
 	// Constructors
 
@@ -39,7 +39,7 @@ public class Task extends Issue {
 	public Task(String title, String description, Status status, Priority priority, double estimatedHours) {
 		super(title, description, status, priority);
 
-		if ((estimatedHours < 0)) {
+		if ((estimatedHours <= 0)) {
 			throw new InvalidEntityException("estimatedHours não pode ser inferior a 0");
 		}
 		
@@ -53,7 +53,7 @@ public class Task extends Issue {
 
 	// Setters
 	public void setEstimatedHours(double estimatedHours) {
-		if ((estimatedHours < 0)) {
+		if ((estimatedHours <= 0)) {
 			throw new InvalidEntityException("estimatedHours não pode ser inferior a 0");
 		}
 		

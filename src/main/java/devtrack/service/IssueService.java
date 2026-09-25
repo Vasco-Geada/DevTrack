@@ -3,6 +3,7 @@ package devtrack.service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import devtrack.model.Issue;
 import devtrack.model.Project;
@@ -53,15 +54,11 @@ public class IssueService {
 	}
 	//Order by
 	public List<Issue> orderByPriority(Project project) {
-		if (project == null || !(project instanceof Project)) {
+		if (project == null ) {
 			throw new IllegalStateException("Project or user are null");
 		}
-		
-		if ( project.getIssues().size() < 2) {
-			return  new ArrayList<>();
-		}
 
-		return project.getIssues().stream().sorted(Comparator.comparing(Issue::getPriority).thenComparing(Issue::getPriority)).toList().reversed();
+		return project.getIssues().stream().sorted(Comparator.comparing(Issue::getPriority)).toList().reversed();
 	}
 
 	//Search 
@@ -74,7 +71,7 @@ public class IssueService {
 			return  new ArrayList<>();
 		}
 
-		return project.getIssues().stream().filter(issue -> issue.getTitle().contains(title.toLowerCase())).toList();
+		return project.getIssues().stream().filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))).toList();
 	}
 	
 	//Count
