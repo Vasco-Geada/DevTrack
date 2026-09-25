@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import devtrack.exception.InvalidEntityException;
-import devtrack.model.Issue;
 import devtrack.model.Task;
 import devtrack.model.Enums.Priority;
 

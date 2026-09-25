@@ -11,6 +11,7 @@ import devtrack.model.Enums.Priority;
 
 class ProjectTest {
 	//Tests	
+	
 	@Test
 	void testAddIssue() {
 		Project p = new Project("new project");
