@@ -1,5 +1,7 @@
 package devtrack.model;
 
+import java.util.Objects;
+
 import devtrack.exception.InvalidEntityException;
 import devtrack.utils.MainUtils;
 
@@ -61,5 +63,22 @@ public class User {
 		if(!(email.contains("@")) || !(email.contains(".")) ) {
 			throw new InvalidEntityException("email inválido");
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		User other = (User) obj;
+		return Objects.equals(id, other.id);
 	}
 }

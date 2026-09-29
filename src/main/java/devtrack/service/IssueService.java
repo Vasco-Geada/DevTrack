@@ -10,19 +10,32 @@ import devtrack.model.Project;
 import devtrack.model.User;
 import devtrack.model.Enums.Priority;
 import devtrack.model.Enums.Status;
+import devtrack.repository.Repository;
 
 public class IssueService {
+	// Attributes
+	private final Repository<Issue, String> repository;
+
+	public IssueService(Repository<Issue, String> repository) {
+		this.repository = repository;
+
+	}
+
+	// Getter
+	public Repository<Issue, String> getRepository() {
+		/* TO DO Melhorar */
+		return repository;
+	}
 
 	// Methods
-	
-	//Find By
+	// Find By
 	public List<Issue> findByStatus(Project project, Status status) {
 		if (project == null || status == null) {
 			throw new IllegalStateException("Project or user are null");
 		}
-		
-		if ( project.getIssues().size() < 1) {
-			return  new ArrayList<>();
+
+		if (project.getIssues().size() < 1) {
+			return new ArrayList<>();
 		}
 
 		return project.getIssues().stream().filter(issue -> issue.getStatus().equals(status)).toList();
@@ -32,11 +45,11 @@ public class IssueService {
 		if (project == null || priority == null) {
 			throw new IllegalStateException("Project or user are null");
 		}
-		
-		if ( project.getIssues().size() < 1) {
-			return  new ArrayList<>();
+
+		if (project.getIssues().size() < 1) {
+			return new ArrayList<>();
 		}
-		
+
 		return project.getIssues().stream().filter(issue -> issue.getPriority().equals(priority)).toList();
 	}
 
@@ -44,44 +57,46 @@ public class IssueService {
 		if (project == null || user == null) {
 			throw new IllegalStateException("Project/user is null");
 		}
-		
-		if ( project.getIssues().size() < 1) {
-			return  new ArrayList<>();
+
+		if (project.getIssues().size() < 1) {
+			return new ArrayList<>();
 		}
-		
 
 		return project.getIssues().stream().filter(issue -> user.equals(issue.getAssignedUser())).toList();
 	}
-	//Order by
+
+	// Order by
 	public List<Issue> orderByPriority(Project project) {
-		if (project == null ) {
+		if (project == null) {
 			throw new IllegalStateException("Project or user are null");
 		}
 
 		return project.getIssues().stream().sorted(Comparator.comparing(Issue::getPriority)).toList().reversed();
 	}
 
-	//Search 
+	// Search
 	public List<Issue> searchByTitle(Project project, String title) {
 		if (project == null || title == null) {
 			throw new IllegalStateException("Project or user are null");
 		}
-		
-		if ( project.getIssues().size() < 1) {
-			return  new ArrayList<>();
+
+		if (project.getIssues().size() < 1) {
+			return new ArrayList<>();
 		}
 
-		return project.getIssues().stream().filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT))).toList();
+		return project.getIssues().stream()
+				.filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT)))
+				.toList();
 	}
-	
-	//Count
+
+	// Count
 	public long countOpenIssues(Project project) {
 		if (project == null) {
 			throw new IllegalStateException("Project or user are null");
 		}
-		
-		if ( project.getIssues().size() < 1) {
-			return  0;
+
+		if (project.getIssues().size() < 1) {
+			return 0;
 		}
 
 		return project.getIssues().stream().filter(issue -> issue.getStatus().equals(Status.OPEN)).count();

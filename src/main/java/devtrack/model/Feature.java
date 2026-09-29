@@ -47,15 +47,16 @@ public class Feature extends Issue {
 	// Methods
 	@Override
 	public String getDetails() {
-		String returnText = "Feature: " + this.getTitle() + "\n" + "Priority: " + this.getPriority() + "\n"
-				+ "Criteria: " + this.getCriteria() + "\n" + "Status: " + this.getStatus() + "\n" + "User: ";
-		
+		String returnText = "Feature: " + this.getTitle() + "\n" + "Id: " + this.getId() + "\n" + "Priority: "
+				+ this.getPriority() + "\n" + "Criteria: " + this.getCriteria() + "\n" + "Status: " + this.getStatus()
+				+ "\n" + "User: ";
+
 		if (this.getAssignedUser() != null) {
 			returnText += this.getAssignedUser().getName();
 		} else {
 			returnText += "Unassigned";
 		}
-		
+
 		return returnText;
 	}
 }

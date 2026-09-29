@@ -5,8 +5,13 @@ import devtrack.model.Task;
 import devtrack.model.User;
 import devtrack.model.Enums.Priority;
 import devtrack.model.Enums.Severity;
+
+import java.util.Optional;
+import java.util.Scanner;
+
 import devtrack.model.Bug;
 import devtrack.model.Feature;
+import devtrack.model.Issue;
 
 public class Main {
 
@@ -14,10 +19,12 @@ public class Main {
 
 	// Methods
 	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
 		System.out.println("Project: " + devtrack.getName());
 		System.out.println("");
 		System.out.println("Issues");
 		User admin = new User("Admin", "admin@email.com");
+		
 
 		devtrack.addIssue(
 				new Bug("Implement authentication", "This is  a description", Priority.HIGH, Severity.CRITICAL));
@@ -31,5 +38,12 @@ public class Main {
 
 		}
 
+		System.out.println("Enter id");
+		String id = scanner.nextLine();
+		Optional<Issue> issue = devtrack.findIssueById(id);
+		
+		scanner.close();
+		
+		System.out.println(issue.isPresent());
 	}
 }

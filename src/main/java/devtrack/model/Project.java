@@ -2,6 +2,7 @@ package devtrack.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import devtrack.exception.InvalidEntityException;
 import devtrack.utils.MainUtils;
@@ -96,6 +97,17 @@ public class Project {
 
 		this.issues.add(issue);
 
+	}
+
+	public Optional<Issue> findIssueById(String id) {
+		if (id == null || id.isBlank()) {
+			throw new IllegalStateException("Project or id are null");
+		}
+		
+
+		Optional<Issue> result = this.getIssues().stream().filter(issue -> issue.getId().equals(id)).findFirst();
+
+		return result;
 	}
 
 }
