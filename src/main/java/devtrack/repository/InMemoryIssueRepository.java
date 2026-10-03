@@ -10,67 +10,67 @@ import devtrack.exception.InvalidEntityException;
 import devtrack.model.Issue;
 
 public class InMemoryIssueRepository implements Repository<Issue, String> {
-	// Attributes
-	private final Map<String, Issue> data;
+    // Attributes
 
-	// Constructors
-	public InMemoryIssueRepository() {
-		this.data = new HashMap<>();
-	}
-	
-	public InMemoryIssueRepository(Map<String, Issue> data) {
-		if(data == null) {
-			throw new InvalidEntityException("Data cannot be null");
-		}
-		
-		this.data = new HashMap<>(data);
-	}
+    private final Map<String, Issue> data;
 
-	// Getters
+    // Constructors
+    public InMemoryIssueRepository() {
+        this.data = new HashMap<>();
+    }
 
-	@Override
-	public Optional<Issue> findById(String id) {
-		if(id == null || id.isBlank()) {
-			throw new InvalidEntityException("Id inválido");
-		}
-		
-		return Optional.ofNullable(data.get(id));
-	}
-	
-	@Override
-	public List<Issue> findAll() {
-		List<Issue> result = new ArrayList<Issue>(data.values());
-		
-		return List.copyOf(result);
-	}
+    public InMemoryIssueRepository(Map<String, Issue> data) {
+        if (data == null) {
+            throw new InvalidEntityException("Data cannot be null");
+        }
 
-	// Setters
-	@Override
-	public void save(Issue entity) {
-		if(entity == null) {
-			throw new InvalidEntityException("Issue inválida");
-		}
-		
-		if(this.data.containsKey(entity.getId())) {
-			throw new InvalidEntityException("Issue já existe");
-		}
-		
-		this.data.put(entity.getId(), entity);
-	}	
+        this.data = new HashMap<>(data);
+    }
 
-	//Methods
-	@Override
-	public void deleteById(String id) {
-		if(id == null || id.isBlank()) {
-			throw new InvalidEntityException("Id inválido");
-		}
-		
-		if(this.data.get(id) != null) {
-			this.data.remove(id);			
-		} else {
-					
-			throw new InvalidEntityException("Issue não existe");
-		}
-		
-	}
+    // Getters
+    @Override
+    public Optional<Issue> findById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new InvalidEntityException("Id inválido");
+        }
+
+        return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public List<Issue> findAll() {
+        List<Issue> result = new ArrayList<>(data.values());
+
+        return List.copyOf(result);
+    }
+
+    // Setters
+    @Override
+    public void save(Issue entity) {
+        if (entity == null) {
+            throw new InvalidEntityException("Issue inválida");
+        }
+
+        if (this.data.containsKey(entity.getId())) {
+            throw new InvalidEntityException("Issue já existe");
+        }
+
+        this.data.put(entity.getId(), entity);
+    }
+
+    //Methods
+    @Override
+    public void deleteById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new InvalidEntityException("Id inválido");
+        }
+
+        if (this.data.get(id) != null) {
+            this.data.remove(id);
+        } else {
+
+            throw new InvalidEntityException("Issue não existe");
+        }
+
+    }
 }

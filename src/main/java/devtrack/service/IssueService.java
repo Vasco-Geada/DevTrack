@@ -1,104 +1,144 @@
 package devtrack.service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
-import devtrack.model.Issue;
-import devtrack.model.Project;
-import devtrack.model.User;
+import devtrack.exception.InvalidEntityException;
 import devtrack.model.Enums.Priority;
 import devtrack.model.Enums.Status;
+import devtrack.model.Issue;
+import devtrack.model.User;
 import devtrack.repository.Repository;
 
 public class IssueService {
-	// Attributes
-	private final Repository<Issue, String> repository;
 
-	public IssueService(Repository<Issue, String> repository) {
-		this.repository = repository;
+    // Attributes
+    private final Repository<Issue, String> repository;
 
-	}
+    public IssueService(Repository<Issue, String> repository) {
+        if (repository == null) {
+            throw new InvalidEntityException("Repository cannot be null");
+        }
 
-	// Getter
-	public Repository<Issue, String> getRepository() {
-		/* TO DO Melhorar */
-		return repository;
-	}
+        this.repository = repository;
 
-	// Methods
-	// Find By
-	public List<Issue> findByStatus(Project project, Status status) {
-		if (project == null || status == null) {
-			throw new IllegalStateException("Project or user are null");
-		}
+    }
 
-		if (project.getIssues().size() < 1) {
-			return new ArrayList<>();
-		}
+    //Create & Delete
+    public void createIssue(Issue issue) {
+        if (issue == null) {
+            throw new InvalidEntityException("Issue is null");
+        }
 
-		return project.getIssues().stream().filter(issue -> issue.getStatus().equals(status)).toList();
-	}
+        this.repository.save(issue);
+    }
 
-	public List<Issue> findByPriority(Project project, Priority priority) {
-		if (project == null || priority == null) {
-			throw new IllegalStateException("Project or user are null");
-		}
+    public void deleteIssue(String id) {
+        if (this.repository.findById(id).isEmpty()) {
+            throw new InvalidEntityException("Issue does not exist");
+        }
 
-		if (project.getIssues().size() < 1) {
-			return new ArrayList<>();
-		}
+        this.repository.deleteById(id);
+    }
 
-		return project.getIssues().stream().filter(issue -> issue.getPriority().equals(priority)).toList();
-	}
+    // Find 
+    public List<Issue> findByStatus(Status status) {
+        if (status == null) {
+            throw new InvalidEntityException("Status is null");
+        }
 
-	public List<Issue> findAssignTo(Project project, User user) {
-		if (project == null || user == null) {
-			throw new IllegalStateException("Project/user is null");
-		}
+        return this.findAll().stream().filter(issue -> issue.getStatus().equals(status)).toList();
+    }
 
-		if (project.getIssues().size() < 1) {
-			return new ArrayList<>();
-		}
+    public List<Issue> findByPriority(Priority priority) {
+        if (priority == null) {
+            throw new InvalidEntityException("Priority is null");
+        }
 
-		return project.getIssues().stream().filter(issue -> user.equals(issue.getAssignedUser())).toList();
-	}
+        return this.findAll().stream().filter(issue -> issue.getPriority().equals(priority)).toList();
+    }
 
-	// Order by
-	public List<Issue> orderByPriority(Project project) {
-		if (project == null) {
-			throw new IllegalStateException("Project or user are null");
-		}
+    public List<Issue> findAssignTo(User user) {
+        if (user == null) {
+            throw new InvalidEntityException("User is null");
+        }
 
-		return project.getIssues().stream().sorted(Comparator.comparing(Issue::getPriority)).toList().reversed();
-	}
+        return this.findAll().stream().filter(issue -> user.equals(issue.getAssignedUser())).toList();
+    }
 
-	// Search
-	public List<Issue> searchByTitle(Project project, String title) {
-		if (project == null || title == null) {
-			throw new IllegalStateException("Project or user are null");
-		}
+    public Optional<Issue> findById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new InvalidEntityException("Id is null");
+        }
 
-		if (project.getIssues().size() < 1) {
-			return new ArrayList<>();
-		}
+        return this.repository.findById(id);
+    }
 
-		return project.getIssues().stream()
-				.filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT)))
-				.toList();
-	}
+    public List<Issue> findAll() {
 
-	// Count
-	public long countOpenIssues(Project project) {
-		if (project == null) {
-			throw new IllegalStateException("Project or user are null");
-		}
+        return this.repository.findAll();
+    }
 
-		if (project.getIssues().size() < 1) {
-			return 0;
-		}
+    // Search & Order by
+    public List<Issue> orderByPriority() {
+        return this.findAll().stream().sorted(Comparator.comparing(Issue::getPriority)).toList().reversed();
+    }
 
-		return project.getIssues().stream().filter(issue -> issue.getStatus().equals(Status.OPEN)).count();
-	}
+    public List<Issue> searchByTitle(String title) {
+        if (title == null || title.isBlank()) {
+            throw new InvalidEntityException("Title is null");
+        }
+
+        return this.findAll().stream()
+                .filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT)))
+                .toList();
+    }
+
+    public long countOpenIssues() {
+
+        return this.findAll().stream().filter(issue -> issue.getStatus().equals(Status.OPEN)).count();
+    }
+
+    // Issue Operations
+    public void startIssue(String id) {
+        Optional<Issue> issue = this.repository.findById(id);
+
+        if (issue.isEmpty()) {
+            throw new InvalidEntityException("Issue does not exist");
+        }
+
+        issue.get().start();
+    }
+
+    public void completeIssue(String id) {
+        Optional<Issue> issue = this.repository.findById(id);
+
+        if (issue.isEmpty()) {
+            throw new InvalidEntityException("Issue does not exist");
+        }
+
+        issue.get().complete();
+    }
+
+    public void assignUser(String id, User user) {
+        Optional<Issue> issue = this.repository.findById(id);
+
+        if (issue.isEmpty()) {
+            throw new InvalidEntityException("Issue does not exist");
+        }
+
+        issue.get().assignTo(user);
+    }
+
+    public void removeAssignedUser(String id) {
+        Optional<Issue> issue = this.repository.findById(id);
+
+        if (issue.isEmpty()) {
+            throw new InvalidEntityException("Issue does not exist");
+        }
+
+        issue.get().removeAssignedUser();
+    }
 }

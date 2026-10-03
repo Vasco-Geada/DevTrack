@@ -7,107 +7,106 @@ import java.util.Optional;
 import devtrack.exception.InvalidEntityException;
 import devtrack.utils.MainUtils;
 
-public class Project {
-	// ########## Attributes
-	private final String id;
-	private String name;
-	private String description;
-	private List<Issue> issues = new ArrayList<>();
+public class Project implements Identifiable<String> {
+    // ########## Attributes
 
-	// ########## Constructors
+    private final String id;
+    private String name;
+    private String description;
+    private List<Issue> issues = new ArrayList<>();
 
-	public Project(String name) {
-		if (name == null) {
-			throw new InvalidEntityException("name não pode ser null");
-		} else if (name.isBlank()) {
+    // ########## Constructors
+    public Project(String name) {
+        if (name == null) {
+            throw new InvalidEntityException("name não pode ser null");
+        } else if (name.isBlank()) {
 
-			throw new InvalidEntityException("name não pode ser vazio");
-		}
+            throw new InvalidEntityException("name não pode ser vazio");
+        }
 
-		this.id = MainUtils.generateId();
-		this.name = name;
-		this.description = "";
-	}
+        this.id = MainUtils.generateId();
+        this.name = name;
+        this.description = "";
+    }
 
-	public Project(String name, String description) {
-		this(name);
-		setDescription(description);
-	}
+    public Project(String name, String description) {
+        this(name);
+        setDescription(description);
+    }
 
-	public Project(String name, String description, List<Issue> issues) {
-		this(name, description);
-		setIssues(issues);
-	}
+    public Project(String name, String description, List<Issue> issues) {
+        this(name, description);
+        setIssues(issues);
+    }
 
-	// ########## Getters
-	protected String getId() {
-		return id;
-	}
+    // ########## Getters
+    @Override
+    public String getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public List<Issue> getIssues() {
-		return List.copyOf(issues);
-	}
+    public List<Issue> getIssues() {
+        return List.copyOf(issues);
+    }
 
-	public Issue getIssue(int index) {
-		return issues.get(index);
-	}
+    public Issue getIssue(int index) {
+        return issues.get(index);
+    }
 
-	// ########## Setters
-	private void setIssues(List<Issue> issues) {
-		if ((issues == null)) {
-			throw new InvalidEntityException("issues não pode ser null");
-		}
-		this.issues = new ArrayList<>(issues);
-	}
+    // ########## Setters
+    private void setIssues(List<Issue> issues) {
+        if ((issues == null)) {
+            throw new InvalidEntityException("issues não pode ser null");
+        }
+        this.issues = new ArrayList<>(issues);
+    }
 
-	public void setName(String name) {
-		if (name == null) {
-			throw new InvalidEntityException("name não pode ser null");
-		} else if (name.isBlank()) {
+    public void setName(String name) {
+        if (name == null) {
+            throw new InvalidEntityException("name não pode ser null");
+        } else if (name.isBlank()) {
 
-			throw new InvalidEntityException("name não pode ser vazio");
-		}
+            throw new InvalidEntityException("name não pode ser vazio");
+        }
 
-		this.name = name;
+        this.name = name;
 
-	}
+    }
 
-	public void setDescription(String description) {
+    private void setDescription(String description) {
 
-		if (description == null) {
-			throw new InvalidEntityException("description não pode ser null");
-		}
-		this.description = description;
-	}
+        if (description == null) {
+            throw new InvalidEntityException("description não pode ser null");
+        }
+        this.description = description;
+    }
 
-	// ########## Methods
-	public void addIssue(Issue issue) {
+    // ########## Methods
+    public void addIssue(Issue issue) {
 
-		if ((issue == null)) {
-			throw new InvalidEntityException("issue não pode ser null");
-		}
+        if ((issue == null)) {
+            throw new InvalidEntityException("issue não pode ser null");
+        }
 
-		this.issues.add(issue);
+        this.issues.add(issue);
 
-	}
+    }
 
-	public Optional<Issue> findIssueById(String id) {
-		if (id == null || id.isBlank()) {
-			throw new IllegalStateException("Project or id are null");
-		}
-		
+    public Optional<Issue> findIssueById(String id) {
+        if (id == null || id.isBlank()) {
+            throw new IllegalStateException("Project or id are null");
+        }
 
-		Optional<Issue> result = this.getIssues().stream().filter(issue -> issue.getId().equals(id)).findFirst();
+        Optional<Issue> result = this.getIssues().stream().filter(issue -> issue.getId().equals(id)).findFirst();
 
-		return result;
-	}
-
+        return result;
+    }
 }
