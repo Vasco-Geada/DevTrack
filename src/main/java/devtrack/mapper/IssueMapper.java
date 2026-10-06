@@ -4,8 +4,11 @@ import java.util.List;
 
 import devtrack.dto.IssueResponse;
 import devtrack.exception.InvalidEntityException;
+import devtrack.model.Bug;
 import devtrack.model.Enums.IssueType;
+import devtrack.model.Feature;
 import devtrack.model.Issue;
+import devtrack.model.Task;
 
 public class IssueMapper {
 
@@ -38,18 +41,14 @@ public class IssueMapper {
     }
 
     private IssueType checkType(Issue issue) {
-        if (!(issue instanceof Issue)) {
-            throw new IllegalArgumentException("Unknown issue type: " + issue.getClass().getSimpleName());
-        }
-
-        switch (issue.getClass().getSimpleName()) {
-            case "Bug" -> {
+        switch (issue) {
+            case Bug bug -> {
                 return IssueType.BUG;
             }
-            case "Feature" -> {
+            case Feature feature -> {
                 return IssueType.FEATURE;
             }
-            case "Task" -> {
+            case Task task -> {
                 return IssueType.TASK;
             }
             default ->

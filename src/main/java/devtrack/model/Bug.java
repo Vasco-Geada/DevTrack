@@ -31,6 +31,11 @@ public class Bug extends Issue {
         this.severity = severity;
     }
 
+    public Bug(String title, String description, Status status, Priority priority, Severity severity) {
+        this(title, description, status, priority);
+        this.severity = severity;
+    }
+
     public Bug(String title, String description, Status status, Priority priority, Severity severity, User assignedUser) {
         this(title, description, status, priority);
         this.severity = severity;

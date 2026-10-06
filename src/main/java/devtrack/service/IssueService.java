@@ -122,6 +122,7 @@ public class IssueService {
         issue.get().complete();
     }
 
+    //User Operations
     public void assignUser(String id, User user) {
         Optional<Issue> issue = this.repository.findById(id);
 

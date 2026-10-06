@@ -18,6 +18,53 @@ class InMemoryRepositoryTest {
     // Tests
 
     @Test
+    void saveNullIssue_true_Test() {
+        Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
+
+        InMemoryRepository<Task, String> inMemoryRepository = new InMemoryRepository<>();
+        InMemoryRepository<Task, String> repositoryB = new InMemoryRepository<>();
+
+        inMemoryRepository.save(task);
+
+        assertEquals(0, repositoryB.findAll().size());
+        assertEquals(1, inMemoryRepository.findAll().size());
+        assertEquals(Optional.empty(), repositoryB.findById(task.getId()));
+
+        assertThrows(InvalidEntityException.class, () -> {
+            inMemoryRepository.save(null);
+        });
+        assertThrows(InvalidEntityException.class, () -> {
+            inMemoryRepository.save(task);
+        });
+
+        assertEquals(1, inMemoryRepository.findAll().size());
+
+        List<Task> list = inMemoryRepository.findAll();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            list.add(new Task("Another Task", "This is another task", Priority.LOW));
+        });
+
+        assertEquals(1, inMemoryRepository.findAll().size());
+
+        assertEquals(Optional.of(task), inMemoryRepository.findById(task.getId()));
+
+        assertEquals(Optional.empty(), inMemoryRepository.findById("123123123"));
+        assertThrows(InvalidEntityException.class, () -> {
+            inMemoryRepository.findById(null);
+        });
+
+        assertThrows(InvalidEntityException.class, () -> {
+            inMemoryRepository.deleteById("123123123");
+        });
+        assertThrows(InvalidEntityException.class, () -> {
+            inMemoryRepository.deleteById(null);
+        });
+
+        inMemoryRepository.deleteById(task.getId());
+        assertEquals(0, inMemoryRepository.findAll().size());
+    }
+
+    @Test
     void saveFindDeleteIssue_true_Test() {
         Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
 

@@ -11,9 +11,11 @@ import devtrack.exception.InvalidEntityException;
 import devtrack.exception.InvalidIssueStateException;
 import devtrack.model.Enums.ActivityType;
 import devtrack.model.Enums.Priority;
+import devtrack.model.Enums.Status;
 import devtrack.model.Issue;
 import devtrack.model.IssueActivity;
 import devtrack.model.Task;
+import devtrack.model.User;
 import devtrack.repository.InMemoryRepository;
 import devtrack.service.IssueService;
 
@@ -59,7 +61,8 @@ class IssueServiceTest {
         Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
 
         InMemoryRepository<Issue, String> inMemoryRepository = new InMemoryRepository<>();
-        inMemoryRepository.save(task);
+        IssueService issueService = new IssueService(inMemoryRepository);
+        issueService.createIssue(task);
 
         assertEquals(1, inMemoryRepository.findAll().size());
     }
@@ -69,9 +72,10 @@ class IssueServiceTest {
         Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
 
         InMemoryRepository<Issue, String> inMemoryRepository = new InMemoryRepository<>();
-        inMemoryRepository.save(task);
+        IssueService issueService = new IssueService(inMemoryRepository);
+        issueService.createIssue(task);
 
-        assertEquals(Optional.of(task), inMemoryRepository.findById(task.getId()));
+        assertEquals(Optional.of(task), issueService.findById(task.getId()));
     }
 
     @Test
@@ -79,9 +83,10 @@ class IssueServiceTest {
         Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
 
         InMemoryRepository<Issue, String> inMemoryRepository = new InMemoryRepository<>();
-        inMemoryRepository.save(task);
+        IssueService issueService = new IssueService(inMemoryRepository);
+        issueService.createIssue(task);
 
-        assertEquals(Optional.empty(), inMemoryRepository.findById("123123123"));
+        assertEquals(Optional.empty(), issueService.findById("123123123"));
     }
 
     @Test
@@ -89,10 +94,10 @@ class IssueServiceTest {
         Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
 
         InMemoryRepository<Issue, String> inMemoryRepository = new InMemoryRepository<>();
+        IssueService issueService = new IssueService(inMemoryRepository);
+        issueService.createIssue(task);
 
-        inMemoryRepository.save(task);
-
-        inMemoryRepository.deleteById(task.getId());
+        issueService.deleteIssue(task.getId());
 
         assertEquals(0, inMemoryRepository.findAll().size());
     }
@@ -137,6 +142,69 @@ class IssueServiceTest {
         assertEquals(Priority.HIGH, list.get(1).getPriority());
         assertEquals(Priority.MEDIUM, list.get(2).getPriority());
         assertEquals(Priority.LOW, list.get(3).getPriority());
+
+    }
+
+    @Test
+    void filtersFindBy_Test() {
+        IssueService issueService = new IssueService(new InMemoryRepository<>());
+        User user1 = new User("User 1", "user1@example.com");
+
+        issueService.createIssue(new Task("Implement LOGIN", "This description", Status.IN_PROGRESS, Priority.LOW));
+        issueService.createIssue(new Task("Implement UI", "This description", Priority.CRITICAL, Status.IN_PROGRESS));
+        issueService.createIssue(new Task("Fix login bug", "This description", Priority.LOW, user1));
+        issueService.createIssue(new Task("Create dashboard", "This description", Priority.HIGH, user1));
+
+        assertEquals(2, issueService.findByStatus(Status.IN_PROGRESS).size());
+        assertEquals(2, issueService.findByPriority(Priority.LOW).size());
+        assertEquals(2, issueService.findAssignTo(user1).size());
+
+    }
+
+    @Test
+    void countOpenIssues_Test() {
+        IssueService issueService = new IssueService(new InMemoryRepository<>());
+
+        /*
+		 * ORDER BY WITH MULTIPLE TASKS, CHECK IF THE TASK ARE ORDERED BY PRIORITY
+		 * (CRITICAL -> LOW)
+         */
+        issueService.createIssue(new Task("Implement UI", "This description", Priority.CRITICAL));
+        issueService.createIssue(new Task("Fix login bug", "This description", Priority.MEDIUM));
+        issueService.createIssue(new Task("Create dashboard", "This description", Priority.HIGH));
+
+        assertEquals(4, issueService.countOpenIssues());
+
+    }
+
+    @Test
+    void nullValues_Test() {
+        IssueService issueService = new IssueService(new InMemoryRepository<>());
+        Task task = new Task("Implement LOGIN", "This description", Priority.LOW);
+        issueService.createIssue(task);
+
+        assertThrows(InvalidEntityException.class, () -> {
+            IssueService testIssueService = new IssueService(null);
+        });
+        //Test issue operations with null values
+        assertThrows(InvalidEntityException.class, () -> {
+            issueService.findByPriority(null);
+        });
+        assertThrows(InvalidEntityException.class, () -> {
+            issueService.completeIssue(null);
+        });
+
+        //Test users operations with null values
+        assertThrows(InvalidEntityException.class, () -> {
+            issueService.assignUser(null, null);
+        });
+        assertThrows(InvalidEntityException.class, () -> {
+            issueService.assignUser(task.getId(), null);
+        });
+
+        assertThrows(InvalidEntityException.class, () -> {
+            issueService.removeAssignedUser(null);
+        });
 
     }
 }
