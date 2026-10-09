@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import devtrack.exception.InvalidEntityException;
+import devtrack.exception.IssueNotFoundException;
 import devtrack.model.Enums.Priority;
 import devtrack.model.Enums.Status;
 import devtrack.model.Issue;
@@ -79,6 +80,16 @@ public class IssueService {
     public List<Issue> findAll() {
 
         return this.repository.findAll();
+    }
+
+    public Optional<Issue> getIssueById(String id) {
+        Optional<Issue> issue = this.repository.findById(id);
+
+        if (issue.isPresent()) {
+            return issue;
+        }
+
+        throw new IssueNotFoundException("Issue not found with id: " + id);
     }
 
     // Search & Order by

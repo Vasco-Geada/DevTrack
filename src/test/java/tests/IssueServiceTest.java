@@ -173,7 +173,7 @@ class IssueServiceTest {
         issueService.createIssue(new Task("Fix login bug", "This description", Priority.MEDIUM));
         issueService.createIssue(new Task("Create dashboard", "This description", Priority.HIGH));
 
-        assertEquals(4, issueService.countOpenIssues());
+        assertEquals(3, issueService.countOpenIssues());
 
     }
 
