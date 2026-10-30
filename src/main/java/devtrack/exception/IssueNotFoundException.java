@@ -7,4 +7,8 @@ public class IssueNotFoundException extends RuntimeException {
     public IssueNotFoundException(String errorMessage) {
         super(errorMessage);
     }
+
+    public IssueNotFoundException(String errorMessage, Throwable err) {
+        super(errorMessage, err);
+    }
 }

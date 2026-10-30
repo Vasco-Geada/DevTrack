@@ -38,13 +38,36 @@ public class IssueService {
 
     public void deleteIssue(String id) {
         if (this.repository.findById(id).isEmpty()) {
-            throw new InvalidEntityException("Issue does not exist");
+            throw new IssueNotFoundException("Issue does not exist");
         }
 
         this.repository.deleteById(id);
     }
 
-    // Find 
+    // Filters
+    public List<Issue> findByStatusPriorityTitle(Status status, Priority priority, String title) {
+
+        List<Issue> issues = this.findAll();
+
+        if (title != null && !title.isBlank()) {
+            issues = this.searchByTitle(title);
+        }
+
+        if (status != null) {
+            issues = issues.stream()
+                    .filter(issue -> issue.getStatus().equals(status))
+                    .toList();
+        }
+
+        if (priority != null) {
+            issues = issues.stream()
+                    .filter(issue -> issue.getPriority().equals(priority))
+                    .toList();
+        }
+
+        return issues;
+    }
+
     public List<Issue> findByStatus(Status status) {
         if (status == null) {
             throw new InvalidEntityException("Status is null");
@@ -82,17 +105,12 @@ public class IssueService {
         return this.repository.findAll();
     }
 
-    public Optional<Issue> getIssueById(String id) {
+    public Issue getIssueById(String id) {
         Optional<Issue> issue = this.repository.findById(id);
 
-        if (issue.isPresent()) {
-            return issue;
-        }
-
-        throw new IssueNotFoundException("Issue not found with id: " + id);
+        return issue.orElseThrow(() -> new IssueNotFoundException("Issue not found with id: " + id));
     }
 
-    // Search & Order by
     public List<Issue> orderByPriority() {
         return this.findAll().stream().sorted(Comparator.comparing(Issue::getPriority)).toList().reversed();
     }
@@ -103,10 +121,11 @@ public class IssueService {
         }
 
         return this.findAll().stream()
-                .filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT)))
+                .filter(issue -> issue.getTitle().toLowerCase(Locale.ROOT).contains(title.toLowerCase(Locale.ROOT).strip()))
                 .toList();
     }
 
+    // utils
     public long countOpenIssues() {
 
         return this.findAll().stream().filter(issue -> issue.getStatus().equals(Status.OPEN)).count();
@@ -117,7 +136,7 @@ public class IssueService {
         Optional<Issue> issue = this.repository.findById(id);
 
         if (issue.isEmpty()) {
-            throw new InvalidEntityException("Issue does not exist");
+            throw new IssueNotFoundException("Issue does not exist");
         }
 
         issue.get().start();
@@ -127,7 +146,7 @@ public class IssueService {
         Optional<Issue> issue = this.repository.findById(id);
 
         if (issue.isEmpty()) {
-            throw new InvalidEntityException("Issue does not exist");
+            throw new IssueNotFoundException("Issue does not exist");
         }
 
         issue.get().complete();
@@ -138,7 +157,10 @@ public class IssueService {
         Optional<Issue> issue = this.repository.findById(id);
 
         if (issue.isEmpty()) {
-            throw new InvalidEntityException("Issue does not exist");
+            throw new IssueNotFoundException("Issue does not exist");
+        }
+        if (user == null) {
+            throw new InvalidEntityException("User is null");
         }
 
         issue.get().assignTo(user);
@@ -148,7 +170,7 @@ public class IssueService {
         Optional<Issue> issue = this.repository.findById(id);
 
         if (issue.isEmpty()) {
-            throw new InvalidEntityException("Issue does not exist");
+            throw new IssueNotFoundException("Issue does not exist");
         }
 
         issue.get().removeAssignedUser();

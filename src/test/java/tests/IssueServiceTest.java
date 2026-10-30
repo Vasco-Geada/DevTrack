@@ -31,6 +31,7 @@ class IssueServiceTest {
         // Create IssueService with null repository, should throw InvalidEntityException
         assertThrows(InvalidEntityException.class, () -> {
             IssueService issueService2 = new IssueService(null);
+            issueService2.createIssue(task);
         });
 
         // Search by status with null status, should throw IllegalStateException

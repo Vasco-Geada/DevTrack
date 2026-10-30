@@ -2,6 +2,6 @@ package devtrack.dto;
 
 import java.util.Map;
 
-import ch.qos.logback.core.status.Status;
+import org.springframework.http.HttpStatus;
 
-public record ApiErrorResponse(Status status, String message, String path, Map<String, String> fieldErrors) {}
+public record ApiErrorResponse(HttpStatus status, String message, String path, Map<String, String> fieldErrors) {}
